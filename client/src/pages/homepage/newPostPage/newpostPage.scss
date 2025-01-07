@@ -1,0 +1,162 @@
+
+.newPostPage {
+    height: 100%;
+    display: flex;
+    gap: 20px;
+    background-color: #f9f9f9;
+    padding: 20px;
+    box-sizing: border-box;
+
+    .formContainer {
+        flex: 3;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #c4c4c4;
+            border-radius: 5px;
+            border: 2px solid #f0f0f0;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background: #a0a0a0;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .wrapper {
+            form {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+
+                .item {
+                    width: calc(33.333% - 10px);
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+
+                    label {
+                        font-size: 14px;
+                        font-weight: 500;
+                        color: #555;
+                    }
+
+                    input,
+                    select,
+                    textarea {
+                        padding: 10px;
+                        border-radius: 5px;
+                        border: 1px solid #d0d0d0;
+                        font-size: 14px;
+                        color: #333;
+                        background-color: #fafafa;
+                        transition: all 0.3s ease;
+
+                        &:focus {
+                            border-color: #009688;
+                            background-color: #ffffff;
+                            outline: none;
+                        }
+                    }
+
+                    textarea {
+                        resize: none;
+                    }
+
+                    &.description {
+                        width: 100%;
+
+                        textarea {
+                            height: 250px;
+                        }
+                    }
+                }
+
+                .sendButton {
+                    width: 100%;
+                    padding: 12px;
+                    border-radius: 5px;
+                    border: none;
+                    background-color: #009688;
+                    color: white;
+                    font-size: 16px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+
+                    &:hover {
+                        background-color: #00796b;
+                    }
+                }
+            }
+        }
+    }
+
+    .sideContainer {
+        flex: 2;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+        justify-content: flex-start;
+        overflow-y: auto;
+
+        /* Allow scrolling if images overflow */
+        &::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #c4c4c4;
+            border-radius: 5px;
+            border: 2px solid #f0f0f0;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background: #a0a0a0;
+        }
+
+        img {
+            width: 80%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #d0d0d0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-widget {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+    }
+}
