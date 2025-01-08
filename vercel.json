@@ -1,22 +1,31 @@
 {
-  "version": 2,
   "builds": [
     {
-      "src": "frontend/package.json",
-      "use": "@vercel/react"
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "build" }
     },
     {
-      "src": "backend/api/**/*.js",
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "socket/**/*.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
-    { "src": "/api/auth(.*)", "dest": "/backend/api/auth.js" },
-    { "src": "/api/test(.*)", "dest": "/backend/api/test.js" },
-    { "src": "/api/users(.*)", "dest": "/backend/api/users.js" },
-    { "src": "/api/posts(.*)", "dest": "/backend/api/posts.js" },
-    { "src": "/api/chats(.*)", "dest": "/backend/api/chats.js" },
-    { "src": "/api/messages(.*)", "dest": "/backend/api/messages.js" },
-    { "src": "/(.*)", "dest": "/frontend/build/$1" }
+    {
+      "src": "/api/(.*)",
+      "dest": "api/$1"
+    },
+    {
+      "src": "/socket/(.*)",
+      "dest": "socket/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/$1"
+    }
   ]
 }

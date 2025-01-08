@@ -1,8 +1,14 @@
 const { Server } =require("socket.io");
 
+const allowedOrigins = 
+  process.env.NODE_ENV === "production" 
+    ? "https://your-vercel-project.vercel.app" // Production origin
+    : "http://localhost:5173"; // Development origin
+
 const io = new Server({
   cors: {
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
+    credentials: true,
   },
 });
 

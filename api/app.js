@@ -17,15 +17,9 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
+  
 
-const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' ? 'https://your-vercel-domain.vercel.app' : 'http://localhost:5173',
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-
-// app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
