@@ -1,5 +1,6 @@
 {
   "scripts": {
-    "build": "npm --prefix client run build"
+    "build": "vite build"
+
   }
 }
