@@ -1,4 +1,3 @@
-
 const Chat = require("../models/Chat");
 const User = require("../models/User");
 
@@ -30,50 +29,49 @@ const getChat = async (req, res) => {
   try {
     const chat = await Chat.findOne({ _id: req.params.id, users: tokenUserId })
       .populate("messages")
+      .populate("users", "id username avatar")
       .exec();
 
     if (!chat) {
       return res.status(404).json({ message: "Chat not found!" });
     }
 
+    // Mark chat as read by adding the current user's ID to the seenBy field if not already present
     if (!chat.seenBy.includes(tokenUserId)) {
       chat.seenBy.push(tokenUserId);
-      await chat.save();
+      await chat.save(); // Save the chat after updating seenBy
     }
 
-    res.status(200).json(chat);
+    res.status(200).json(chat); // Send back the updated chat data
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to get chat!" });
   }
 };
 
-// Create a new chat
+// Create a new chat or return an existing one
 const addChat = async (req, res) => {
   const tokenUserId = req.userId;
   const { receiverId } = req.body;
-  console.log(tokenUserId)
-  console.log(receiverId)
 
   try {
-    // Check if a chat between these users already exists
-    const existingChat = await Chat.findOne({
+    let chat = await Chat.findOne({
       users: { $all: [tokenUserId, receiverId] },
-    });
+    }).populate("users", "id username avatar");
 
-    if (existingChat) {
-      return res.status(400).json({ message: "Chat already exists!" });
+    if (!chat) {
+      chat = new Chat({
+        users: [tokenUserId, receiverId],
+      });
+
+      await chat.save();
+      chat = await chat.populate("users", "id username avatar");
     }
 
-    const newChat = new Chat({
-      users: [tokenUserId, receiverId],
-    });
-
-    await newChat.save();
-    res.status(200).json(newChat);
+    res.status(200).json(chat);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Failed to add chat!" });
+    res.status(500).json({ message: "Failed to add or fetch chat!" });
   }
 };
 

@@ -6,17 +6,17 @@ import { format } from "timeago.js";
 import { SocketContext } from "../../../context/SocketContext";
 import { useNotificationStore } from "../../../lib/notificationStore";
 
-function Chat({ chats: initialChats }) {
+function Chat({ chats: initialChats, initialChatId }) {
   const [chats, setChats] = useState(initialChats); // Local state for chats
   const [chat, setChat] = useState(null);
   const { currentUser } = useContext(AuthContext);
   const { socket } = useContext(SocketContext);
   const messageEndRef = useRef();
-    const decrease = useNotificationStore((state) => state.decrease);
-    const increment = useNotificationStore((state) => state.increment);
-    const fetch = useNotificationStore((state) => state.fetch);
+  const decrease = useNotificationStore((state) => state.decrease);
+  const increment = useNotificationStore((state) => state.increment);
+  const fetch = useNotificationStore((state) => state.fetch);
 
-     useEffect(() => {
+  useEffect(() => {
     fetch(); // Fetch initial notification count
 
     if (!socket) return;
@@ -33,23 +33,37 @@ function Chat({ chats: initialChats }) {
     };
   }, [socket, fetch, increment]);
 
-
+  // Automatically scroll to the latest message
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chat]);
 
-  const handleOpenChat = async (id, receiver) => {
-    try {
-      const res = await apiRequest("/chats/" + id);
-      console.log(res)
-      if (res.data.seenBy.includes(currentUser._id)) {
-        decrease();
+  // Automatically open a chat if an `initialChatId` is provided
+  useEffect(() => {
+    if (initialChatId) {
+      const targetChat = chats.find((c) => c._id === initialChatId);
+      if (targetChat) {
+        handleOpenChat(targetChat._id, targetChat.receiver);
       }
-      setChat({ ...res.data, receiver });
-    } catch (err) {
-      console.log(err);
     }
-  };
+  }, [initialChatId, chats]);
+
+  
+const handleOpenChat = async (id, receiver) => {
+  try {
+    const res = await apiRequest.get("/chats/" + id);
+    
+    if (res.data.seenBy.includes(currentUser._id)) {
+      decrease();
+    }
+
+    // Set the chat and receiver data
+    setChat({ ...res.data, receiver });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 
   // Function to send a message
   const handleSubmit = async (e) => {
@@ -79,43 +93,48 @@ function Chat({ chats: initialChats }) {
         )
       );
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
   // Real-time updates for messages and chat bar
-  useEffect(() => {
-    if (!socket) return;
+useEffect(() => {
+  if (!socket) return;
 
-    const handleMessage = (data) => {
-      // Update the currently opened chat
-      if (chat && chat._id === data.chat) {
-        setChat((prev) => ({ ...prev, messages: [...prev.messages, data] }));
-      }
+  const handleMessage = (data) => {
+    // Update the currently opened chat
+    if (chat && chat._id === data.chat) {
+      setChat((prev) => ({
+        ...prev,
+        messages: [...prev.messages, data],  // Add the new message
+      }));
+    }
 
-      // Update the chat bar
-      setChats((prev) =>
-        prev.map((c) =>
-          c._id === data.chat
-            ? {
-                ...c,
-                lastMessage: data.text,
-                updatedAt: data.createdAt,
-                seenBy: c._id === chat?._id ? [...c.seenBy, currentUser._id] : [],
-              }
-            : c
-        )
-      );
-    };
+    // Update the chat bar with new message details
+    setChats((prev) =>
+      prev.map((c) =>
+        c._id === data.chat
+          ? {
+              ...c,
+              lastMessage: data.text,
+              updatedAt: data.createdAt,
+              seenBy:
+                c._id === chat?._id ? [...c.seenBy, currentUser._id] : [],
+            }
+          : c
+      )
+    );
+  };
 
-    // Listen for new messages
-    socket.on("getMessage", handleMessage);
+  // Listen for incoming messages
+  socket.on("getMessage", handleMessage);
 
-    // Cleanup listener on unmount
-    return () => {
-      socket.off("getMessage", handleMessage);
-    };
-  }, [socket, chat, currentUser._id]);
+  // Clean up the socket listener when the component unmounts
+  return () => {
+    socket.off("getMessage", handleMessage);
+  };
+}, [socket, chat, currentUser._id]);
+
 
   return (
     <div className="chat">
@@ -123,20 +142,20 @@ function Chat({ chats: initialChats }) {
         <h1>Messages</h1>
         {chats?.map((c) => (
           <div
-            className="message"
-            key={c._id}
-            style={{
-              backgroundColor:
-                c.seenBy.includes(currentUser._id) || chat?._id === c._id
-                  ? "white"
-                  : "#fecd514e",
-            }}
-            onClick={() => handleOpenChat(c._id, c.receiver)}
-          >
-            <img src={c.receiver.avatar || "/noavatar.jpg"} alt="" />
-            <span>{c.receiver.username}</span>
-            <p>{c.lastMessage}</p>
-          </div>
+          className="message"
+          key={c._id}
+          style={{
+            backgroundColor:
+              c.seenBy.includes(currentUser._id) || chat?._id === c._id
+                ? "white"
+                : "#fecd514e",  // Message color when not seen
+          }}
+          onClick={() => handleOpenChat(c._id, c.receiver)}  // Open chat on click
+        >
+          <img src={c.receiver.avatar || "/noavatar.jpg"} alt="" />
+          <span>{c.receiver.username}</span>
+          <p>{c.lastMessage}</p>
+        </div>
         ))}
       </div>
 
@@ -172,7 +191,7 @@ function Chat({ chats: initialChats }) {
             <div ref={messageEndRef}></div>
           </div>
           <form onSubmit={handleSubmit} className="bottom">
-            <textarea name="text"></textarea>
+            <textarea name="text" placeholder="Type your message..."></textarea>
             <button>Send</button>
           </form>
         </div>

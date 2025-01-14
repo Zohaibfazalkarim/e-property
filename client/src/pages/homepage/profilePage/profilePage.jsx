@@ -2,12 +2,16 @@ import Chat from "../../../components/navbar/chat/Chat";
 import List from "../../../components/navbar/list/List";
 import "./profilePage.scss";
 import apiRequest from "../../../lib/apiRequest";
-import { Link, useLoaderData, useNavigate } from "react-router-dom";
+import { Link, useLoaderData, useNavigate,useSearchParams } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 
 function ProfilePage() {
   const { updateUser, currentUser } = useContext(AuthContext);
+   const [searchParams] = useSearchParams();
+  const chatId = searchParams.get("chatId");
+  // console.log(chatId)
+
   const navigate = useNavigate();
   const data = useLoaderData();
   console.log(data)
@@ -58,7 +62,7 @@ function ProfilePage() {
       </div>
       <div className="chatContainer">
         <div className="wrapper">
-          <Chat chats={data.chats}/>
+          <Chat chats={data.chats} initialChatId={chatId} />
         </div>
       </div>
     </div>

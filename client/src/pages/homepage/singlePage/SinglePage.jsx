@@ -45,6 +45,32 @@ function SinglePage() {
     }
   };
 
+  const handleSendMessage = async () => {
+  if (!currentUser) {
+    navigate("/login");
+    return;
+  }
+  if (!post.userId || !post.userId._id) {
+    console.error("Invalid receiverId. Cannot send message.");
+    return;
+  }
+
+  const receiverId = post.userId._id;
+  console.log("Receiver ID:", receiverId);
+  console.log("Current User ID:", currentUser._id);
+
+  try {
+    const res = await apiRequest.post("/chats", { receiverId });
+
+    const chatId = res.data._id; 
+    console.log(chatId); // Get chat ID from the response
+    navigate(`/profile?chatId=${chatId}`); // Redirect to profile with chat ID
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
   return (
     <div className="singlePage">
       <div className="details">
@@ -61,7 +87,7 @@ function SinglePage() {
                 <div className="price">PKR {post.price}</div>
               </div>
               <div className="user">
-                <img src={post.userId.avatar} alt="" />
+                <img src={post.userId.avatar || "noavatar.jpg"} alt="" />
                 <span>{post.userId.username}</span>
               </div>
             </div>
@@ -152,7 +178,7 @@ function SinglePage() {
             <Map key={post._id} items={[post]} />
           </div>
           <div className="buttons">
-            <button>
+            <button onClick={handleSendMessage}>
               <img src="/chat.png" alt="" />
               Send a Message
             </button>
@@ -171,5 +197,6 @@ function SinglePage() {
     </div>
   );
 }
+
 
 export default SinglePage;

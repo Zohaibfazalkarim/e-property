@@ -7,7 +7,7 @@ import { useNotificationStore } from "../../lib/notificationStore";
 function Navbar() {
   const [open, setOpen] = useState(false);
 
-  const { currentUser, logout } = useContext(AuthContext);  // Assuming logout is a function to log out the user
+  const { currentUser, logout } = useContext(AuthContext); // Assuming logout is a function to log out the user
   const fetch = useNotificationStore((state) => state.fetch);
   const number = useNotificationStore((state) => state.number);
 
@@ -20,14 +20,14 @@ function Navbar() {
   return (
     <nav>
       <div className="left">
-        <a href="/" className="logo">
+        <Link to="/" className="logo">
           <img src="/logo.png" alt="" />
-          <span>E-Property</span>
-        </a>
-        <a href="/">Home</a>
-        <a href="/">About</a>
-        <a href="/">Contact</a>
-        <a href="/">Agents</a>
+          <span>PropertyHub</span>
+        </Link>
+        <Link to="/">Home</Link>
+        <Link to="/">About</Link>
+        <Link to="/">Contact</Link>
+        <Link to="/">Agents</Link>
       </div>
       <div className="right">
         {currentUser ? (
@@ -41,10 +41,10 @@ function Navbar() {
           </div>
         ) : (
           <>
-            <a href="/login">Sign in</a>
-            <a href="/register" className="register">
+            <Link to="/login">Sign in</Link>
+            <Link to="/register" className="register">
               Sign up
-            </a>
+            </Link>
           </>
         )}
         <div className="menuIcon">
@@ -55,21 +55,21 @@ function Navbar() {
           />
         </div>
         <div className={open ? "menu active" : "menu"}>
-          <a href="/">Home</a>
-          <a href="/">About</a>
-          <a href="/">Contact</a>
-          <a href="/">Agents</a>
+          <Link to="/">Home</Link>
+          <Link to="/">About</Link>
+          <Link to="/">Contact</Link>
+          <Link to="/">Agents</Link>
           {currentUser ? (
             <>
-            <Link to="/profile" className="profile">
-              <a href="/profile">Profile</a>
-              </Link>
-              <a href="/" onClick={handleLogout}>Logout</a>
+              <Link to="/profile">Profile</Link>
+              <a href="/" onClick={handleLogout}>
+                Logout
+              </a>
             </>
           ) : (
             <>
-              <a href="/login">Sign in</a>
-              <a href="/register">Sign up</a>
+              <Link to="/login">Sign in</Link>
+              <Link to="/register">Sign up</Link>
             </>
           )}
         </div>
